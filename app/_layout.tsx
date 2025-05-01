@@ -5,8 +5,10 @@ import "../global.css";
 
 export default function RootLayout() {
   return (
-    <GluestackUIProvider mode="light"><Stack>
+    <GluestackUIProvider mode="light">
+      <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack></GluestackUIProvider>
+      </Stack>
+    </GluestackUIProvider>
   );
 }
