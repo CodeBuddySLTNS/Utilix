@@ -40,6 +40,7 @@ export default function TabsLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="about"
         options={{
@@ -48,6 +49,14 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => (
             <FontAwesome5 size={24} name="info-circle" color={color} />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="(screens)"
+        options={{
+          headerShown: false,
+          tabBarItemStyle: { display: "none" },
         }}
       />
     </Tabs>
