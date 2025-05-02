@@ -10,7 +10,7 @@ import { Image } from "@/components/ui/image";
 import { FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 
-// 01c66d90e75c45c
+const IMGUR_CLIENT_ID = "01c66d90e75c45c";
 
 export default function Img2Link() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
@@ -35,12 +35,13 @@ export default function Img2Link() {
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
+
     const response = await axios.post(
       "https://api.imgur.com/3/image",
       { image: base64, type: "base64" },
       {
         headers: {
-          Authorization: "Client-ID 01c66d90e75c45c",
+          Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
           "Content-Type": "application/json",
         },
       }
