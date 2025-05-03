@@ -8,12 +8,11 @@ const axiosInstance = axios.create({
   baseURL: API_URL,
 });
 
-export const deku = async (url: string, method?: string | undefined | null) => {
-  switch (method?.toUpperCase()) {
-    case "POST":
-      break;
-
-    default:
-      return await axiosInstance.get(url + `&apikey=${API_KEY}`);
-  }
+export const deku = {
+  get: async (url: string) =>
+    await axiosInstance.get(url + `&apikey=${API_KEY}`),
+  fbCover: async (url: string) =>
+    await axiosInstance.get(url + `&apikey=${API_KEY}`, {
+      responseType: "blob",
+    }),
 };

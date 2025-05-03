@@ -25,28 +25,40 @@ import { Buffer } from "buffer";
 global.Buffer = Buffer;
 
 export default function Index() {
-  const [link, setLink] = useState<string | null | boolean>(true);
+  const [link, setLink] = useState<string | ArrayBuffer | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<object | null>(null);
   const [value, setValue] = useState<FBCoverInput>({
     template: "",
-    id: 0,
+    id: 758,
     name: "MrHairy",
     subName: "Dev",
     color: "blue",
   });
 
   const generateFbCover = async () => {
-    console.log("Generating FB Cover with values:", value);
     try {
-      const response = await deku(
+      const response = await deku.fbCover(
         `/canvas/fbcoverv2?name=${value.name}&id=${value.id}&subname=${value.subName}&color=${value.color}`
       );
-      const type = response?.headers["content-type"];
-      setLink(
-        `data:${type};base64,${Buffer.from(response?.data, "binary").toString(
-          "base64"
-        )}`
-      );
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (
+          reader.result &&
+          typeof reader.result === "string" &&
+          reader.result.startsWith("data:application/json")
+        ) {
+          const text = reader.result;
+          const json = JSON.parse(text); // sadya ko to para pag mag throw ng exception matik image yung data
+          setError(json);
+          console.log("Error generating fbcover:", json);
+        } else {
+          // console.log(reader.result.split(",")[0]);
+          setLink(reader.result);
+        }
+      };
+      reader.readAsDataURL(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -141,15 +153,14 @@ export default function Index() {
 
         <Card className="mt-4 mb-8 elevation">
           <View className="h-52">
-            {link ? (
+            {link && typeof link === "string" ? (
               <Image
                 size="full"
                 source={{
-                  uri: "https://api.zetsu.xyz/canvas/fbcoverv2?name=Joshua&id=5&subname=Sy&color=blue&apikey=b0e07f52a4b8e90d06abffa49e1efa19",
+                  uri: link,
                 }}
                 resizeMode="contain"
                 alt="generated image"
-                onError={() => setLink(false)}
               />
             ) : (
               <View className="w-full h-full items-center justify-center bg-gray-200 rounded">
