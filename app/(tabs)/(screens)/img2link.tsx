@@ -1,7 +1,14 @@
 import Header from "@/components/header";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  ToastAndroid,
+  View,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as Clipboard from "expo-clipboard";
@@ -15,6 +22,7 @@ const IMGUR_CLIENT_ID = "01c66d90e75c45c";
 export default function Img2Link() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [link, setLink] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -31,28 +39,37 @@ export default function Img2Link() {
 
   const generateLink = async (uri: string | null | undefined) => {
     if (!uri) return;
+    setLoading(true);
 
-    const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
+    try {
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
-    const response = await axios.post(
-      "https://api.imgur.com/3/image",
-      { image: base64, type: "base64" },
-      {
-        headers: {
-          Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
-          "Content-Type": "application/json",
-        },
+      const response = await axios.post(
+        "https://api.imgur.com/3/image",
+        { image: base64, type: "base64" },
+        {
+          headers: {
+            Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setLink(response.data.data.link);
       }
-    );
-    if (response.status === 200) {
-      setLink(response.data.data.link);
+
+      setImage(null);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      ToastAndroid.show(
+        "Something went wrong, please try again.",
+        ToastAndroid.LONG
+      );
     }
-    if (response.status !== 200) {
-      setLink(null);
-    }
-    setImage(null);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -61,12 +78,10 @@ export default function Img2Link() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <Header />
-      <ScrollView className="px-4">
-        {/* <Text className="mt-4 text-xl font-nunito-bold">Img2Link</Text> */}
-
-        <Card className="mt-3 elevation">
+      <ScrollView className="px-3">
+        <Card className="mt-4 elevation">
           <Text className="text-base font-nunito-regular">
             <Text className="font-nunito-bold text-lg">Img2Link</Text> is a
             powerful tool that allows you to convert images into shareable links
@@ -103,12 +118,14 @@ export default function Img2Link() {
             <Button
               disabled={!image}
               onPress={() => generateLink(image?.uri)}
-              className={`${!image && "bg-gray-100"}`}
+              className={`${(!image || loading) && "bg-gray-100"}`}
             >
               <ButtonText
-                className={`font-nunito-regular ${!image && "text-gray-400"}`}
+                className={`font-nunito-regular ${
+                  (!image || loading) && "text-gray-400"
+                }`}
               >
-                Generate Link
+                {loading ? "Generating..." : "Generate Link"}
               </ButtonText>
             </Button>
           </View>
