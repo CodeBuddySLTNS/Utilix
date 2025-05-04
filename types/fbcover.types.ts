@@ -1,6 +1,6 @@
 export interface FBCoverInput {
   template: string;
-  id: number;
+  id: string;
   name: string;
   subName: string;
   color: string;

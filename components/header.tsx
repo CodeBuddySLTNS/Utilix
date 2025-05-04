@@ -4,7 +4,7 @@ import { Image } from "./ui/image";
 
 const Header = () => {
   return (
-    <View className="w-full p-3 bg-white elevation-md">
+    <View className="w-full p-3 bg-white elevation-md z-20">
       <View className="w-[70px]">
         <Image
           size="none"

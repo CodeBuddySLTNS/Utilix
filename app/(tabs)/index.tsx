@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { HStack } from "@/components/ui/hstack";
 import { Divider } from "@/components/ui/divider";
 import { useRouter } from "expo-router";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export default function Index() {
   const router = useRouter();
@@ -19,35 +20,23 @@ export default function Index() {
             <Text className="font-nunito-medium text-gray-700">View All</Text>
           </View>
           <Divider className="mt-0.5 mb-2" />
-          <HStack space="sm" className="h-16">
+          <HStack space="sm" className="h-20">
             <Pressable
               className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
               onPress={() => router.replace("/(tabs)/(screens)/img2link")}
             >
+              <FontAwesome5 name="image" size={24} color="black" />
               <Text className="font-nunito-regular">Img2Link</Text>
             </Pressable>
 
             <Pressable
-              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
+              className="flex-1 justify-center items-center bg-gray-100 rounded"
               onPress={() => router.replace("/(tabs)/(screens)/fbcover")}
             >
-              <Text className="font-nunito-regular">FB Cover Maker</Text>
-            </Pressable>
-          </HStack>
-
-          <HStack space="sm" className="h-16 mt-2">
-            <Pressable
-              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
-              onPress={() => router.replace("/(tabs)/(screens)/img2link")}
-            >
-              <Text className="font-nunito-regular">Coming Soon</Text>
-            </Pressable>
-
-            <Pressable
-              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
-              onPress={() => router.replace("/(tabs)/(screens)/fbcover")}
-            >
-              <Text className="font-nunito-regular">Coming Soon</Text>
+              <FontAwesome5 name="facebook-square" size={24} color="black" />
+              <Text className="font-nunito-regular text-center">
+                FB Cover Maker
+              </Text>
             </Pressable>
           </HStack>
         </View>
