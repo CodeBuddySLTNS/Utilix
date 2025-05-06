@@ -40,6 +40,94 @@ export default function Index() {
             </Pressable>
           </HStack>
         </View>
+
+        <View className="p-2 pb-3 mt-4 rounded elevation bg-white">
+          <View className="flex-row justify-between items-center">
+            <Text className="font-nunito-bold text-xl text-gray-900">
+              Downloaders
+            </Text>
+            <Text className="font-nunito-medium text-gray-700">View All</Text>
+          </View>
+          <Divider className="mt-0.5 mb-2" />
+          <HStack space="sm" className="h-20">
+            <Pressable
+              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/img2link")}
+            >
+              <Text className="font-nunito-regular">Coming Soon...</Text>
+            </Pressable>
+
+            <Pressable
+              className="flex-1 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/fbcover")}
+            >
+              <Text className="font-nunito-regular text-center">
+                Coming Soon...
+              </Text>
+            </Pressable>
+          </HStack>
+          <HStack space="sm" className="h-20 mt-2">
+            <Pressable
+              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/img2link")}
+            >
+              <Text className="font-nunito-regular">Coming Soon...</Text>
+            </Pressable>
+
+            <Pressable
+              className="flex-1 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/fbcover")}
+            >
+              <Text className="font-nunito-regular text-center">
+                Coming Soon...
+              </Text>
+            </Pressable>
+          </HStack>
+        </View>
+
+        <View className="p-2 pb-3 mt-4 rounded elevation bg-white">
+          <View className="flex-row justify-between items-center">
+            <Text className="font-nunito-bold text-xl text-gray-900">
+              AI Tools
+            </Text>
+            <Text className="font-nunito-medium text-gray-700">View All</Text>
+          </View>
+          <Divider className="mt-0.5 mb-2" />
+          <HStack space="sm" className="h-20">
+            <Pressable
+              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/img2link")}
+            >
+              <Text className="font-nunito-regular">Coming Soon...</Text>
+            </Pressable>
+
+            <Pressable
+              className="flex-1 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/fbcover")}
+            >
+              <Text className="font-nunito-regular text-center">
+                Coming Soon...
+              </Text>
+            </Pressable>
+          </HStack>
+          <HStack space="sm" className="h-20 mt-2">
+            <Pressable
+              className="flex-1 p-2 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/img2link")}
+            >
+              <Text className="font-nunito-regular">Coming Soon...</Text>
+            </Pressable>
+
+            <Pressable
+              className="flex-1 justify-center items-center bg-gray-100 rounded"
+              onPress={() => router.replace("/(tabs)/(screens)/fbcover")}
+            >
+              <Text className="font-nunito-regular text-center">
+                Coming Soon...
+              </Text>
+            </Pressable>
+          </HStack>
+        </View>
       </View>
     </View>
   );

@@ -1,6 +1,6 @@
 import Header from "@/components/header";
 import { Card } from "@/components/ui/card";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import {
   Select,
   SelectTrigger,
@@ -20,7 +20,11 @@ import { deku } from "@/lib/utils";
 import { useCallback, useState } from "react";
 import { FBCoverInput } from "@/types/fbcover.types";
 import { Image } from "@/components/ui/image";
+import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
+import * as Linking from "expo-linking";
 import ImagePreview from "@/components/image-preview";
+import { AxiosResponse } from "axios";
 
 export default function Index() {
   const [preview, setPreview] = useState<{ show: boolean }>({ show: false });
@@ -32,7 +36,7 @@ export default function Index() {
     subName: string;
   }>({ name: "", subName: "" });
   const [value, setValue] = useState<FBCoverInput>({
-    template: "v1",
+    template: "v2",
     id: "",
     name: "",
     subName: "",
@@ -56,18 +60,41 @@ export default function Index() {
     if (validateInputs()) {
       try {
         setLoading(true);
-        const response = await deku.fbCover(
-          `/canvas/fbcoverv2?&id=${value.id || 5}&name=${value.name}&subname=${
-            value.subName
-          }&color=${value.color.trim() || "blue"}`
-        );
+
+        let response: AxiosResponse | undefined;
+
+        switch (value.template) {
+          case "v1":
+            break;
+
+          case "v2":
+            response = await deku.fbCover(
+              `/canvas/fbcoverv2?&id=${value.id || 5}&name=${
+                value.name
+              }&subname=${value.subName}&color=${value.color.trim() || "blue"}`
+            );
+            break;
+
+          case "v3":
+            response = await deku.fbCover(
+              `/canvas/fbcoverv5?&id=${value.id || 5}&name=${
+                value.name
+              }&subname=${value.subName}&color=${value.color.trim() || "blue"}`
+            );
+            break;
+
+          default:
+            break;
+        }
 
         const reader = new FileReader();
         reader.onload = () => {
-          // console.log(reader.result.split(",")[0]);
           setLink(reader.result);
         };
-        reader.readAsDataURL(response.data);
+
+        if (response) {
+          reader.readAsDataURL(response.data);
+        }
       } catch (error) {
         console.log(error);
         setError({ code: (error as { code: string }).code });
@@ -75,6 +102,36 @@ export default function Index() {
       setLoading(false);
     } else {
       setError(null);
+    }
+  };
+
+  const downloadImage = async () => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "We need access to your media library to save images. Please enable this permission in settings.",
+        [{ text: "Open Settings", onPress: () => Linking.openSettings() }]
+      );
+    }
+
+    try {
+      if (typeof link === "string") {
+        const fileName = Date.now() + ".png";
+        const fileUri = FileSystem.cacheDirectory + fileName;
+
+        await FileSystem.writeAsStringAsync(fileUri, link.split(",")[1], {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        const asset = await MediaLibrary.createAssetAsync(fileUri);
+        await MediaLibrary.createAlbumAsync("Utilix", asset, false);
+
+        Alert.alert("Download complete", "Image saved to gallery.");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -109,6 +166,7 @@ export default function Index() {
               <Text className="font-nunito-semibold">FB Cover Template:</Text>
               <Select
                 className="mt-1"
+                defaultValue="v2"
                 selectedValue={value.template}
                 onValueChange={(value) =>
                   setValue((prev) => ({ ...prev, template: value }))
@@ -120,8 +178,14 @@ export default function Index() {
                   className="justify-between items-center"
                 >
                   <SelectInput
-                    placeholder="Select option"
                     className="font-nunito-regular pt-0 mt-2.5"
+                    value={
+                      {
+                        v1: "FB Cover v1",
+                        v2: "FB Cover v2",
+                        v3: "FB Cover v3",
+                      }[value.template] || "Select option"
+                    }
                   />
                   <SelectIcon className="mr-3" as={ChevronDownIcon} />
                 </SelectTrigger>
@@ -131,7 +195,11 @@ export default function Index() {
                     <SelectDragIndicatorWrapper>
                       <SelectDragIndicator />
                     </SelectDragIndicatorWrapper>
-                    <SelectItem label="FB Cover v1" value="v1" />
+                    <SelectItem
+                      label="FB Cover v1 (unavailable)"
+                      isDisabled={true}
+                      value="v1"
+                    />
                     <SelectItem label="FB Cover v2" value="v2" />
                     <SelectItem label="FB Cover v3" value="v3" />
                   </SelectContent>
@@ -242,12 +310,12 @@ export default function Index() {
                       }}
                     />
                   </Pressable>
-                  <Button size="md" action="positive">
+                  <Button size="md" action="positive" onPress={downloadImage}>
                     <ButtonText>Download</ButtonText>
                   </Button>
                 </>
               ) : (
-                <View className="w-full h-full items-center justify-center bg-gray-200 rounded">
+                <View className="w-full h-52 items-center justify-center bg-gray-200 rounded">
                   <Text
                     className={`font-nunito-regular text-center ${
                       error ? "text-red-700" : "text-gray-500"
