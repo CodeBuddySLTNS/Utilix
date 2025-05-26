@@ -192,11 +192,13 @@ export default function Index() {
                 className="mt-1"
                 defaultValue="v2"
                 selectedValue={value.template}
-                onValueChange={(val) =>
-                  value.template === "v1"
-                    ? setValue((prev) => ({ ...prev, id: "", template: val }))
-                    : setValue((prev) => ({ ...prev, template: val }))
-                }
+                onValueChange={(value) => {
+                  setValue((prev) => ({
+                    ...prev,
+                    id: "",
+                    template: value,
+                  }));
+                }}
               >
                 <SelectTrigger
                   variant="outline"
@@ -238,6 +240,7 @@ export default function Index() {
               <Input className="mt-1">
                 <InputField
                   className="font-nunito-regular"
+                  value={value.id}
                   placeholder={
                     value.template === "v1"
                       ? "https://www.facebook.com/username"

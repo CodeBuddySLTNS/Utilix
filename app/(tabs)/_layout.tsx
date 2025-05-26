@@ -1,4 +1,7 @@
+import { useMainStore } from "@/lib/store";
+import { mrhairy } from "@/lib/utils";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Tabs } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -13,6 +16,14 @@ export default function TabsLayout() {
     NunitoSemiBold: require("../../assets/fonts/NunitoSemiBold.ttf"),
     NunitoBold: require("../../assets/fonts/NunitoBold.ttf"),
   });
+
+  const { data } = useQuery({ queryKey: ["token"], queryFn: mrhairy.getToken });
+
+  useEffect(() => {
+    if (data) {
+      useMainStore.getState().setApikey(data.freetoken);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (loaded) {

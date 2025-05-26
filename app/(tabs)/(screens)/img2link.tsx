@@ -15,7 +15,7 @@ import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Image } from "@/components/ui/image";
 import { FontAwesome5 } from "@expo/vector-icons";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const IMGUR_CLIENT_ID = "01c66d90e75c45c";
 
@@ -65,14 +65,22 @@ export default function Img2Link() {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      ToastAndroid.show(
-        "Something went wrong, please try again.",
-        ToastAndroid.LONG
-      );
+      if (error instanceof AxiosError && error.code === "ERR_NETWORK") {
+        ToastAndroid.show(
+          "Please check your internet connection.",
+          ToastAndroid.LONG
+        );
+      } else {
+        ToastAndroid.show(
+          "Something went wrong, please try again.",
+          ToastAndroid.LONG
+        );
+      }
     }
   };
 
   const copyToClipboard = async (text: string) => {
+    console.log(text);
     await Clipboard.setStringAsync(text);
     Alert.alert("Copied to clipboard", text);
   };
