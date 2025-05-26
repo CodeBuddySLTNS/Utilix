@@ -9,14 +9,14 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <GluestackUIProvider mode="light">
-      <QueryClientProvider client={queryClient}>
-        <SafeAreaView className="flex-1">
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaView className="flex-1">
+        <GluestackUIProvider mode="light">
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
-        </SafeAreaView>
-      </QueryClientProvider>
-    </GluestackUIProvider>
+        </GluestackUIProvider>
+      </SafeAreaView>
+    </QueryClientProvider>
   );
 }

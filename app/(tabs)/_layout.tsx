@@ -25,8 +25,15 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: { height: 55, alignItems: "center" },
-        tabBarLabelStyle: { fontSize: 11, fontFamily: "NunitoBold" },
+        tabBarStyle: {
+          margin: 0,
+          height: 75,
+          padding: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontFamily: "NunitoBold",
+        },
       }}
     >
       <Tabs.Screen
@@ -34,7 +41,6 @@ export default function TabsLayout() {
         options={{
           title: "Tools",
           headerShown: false,
-
           tabBarIcon: ({ color }) => (
             <FontAwesome5 name="toolbox" size={26} color={color} />
           ),
@@ -45,6 +51,7 @@ export default function TabsLayout() {
         name="about"
         options={{
           title: "About",
+
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome5 size={24} name="info-circle" color={color} />

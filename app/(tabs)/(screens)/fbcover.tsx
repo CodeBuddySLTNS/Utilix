@@ -24,7 +24,7 @@ import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
 import * as Linking from "expo-linking";
 import ImagePreview from "@/components/image-preview";
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export default function Index() {
   const [preview, setPreview] = useState<{ show: boolean }>({ show: false });
@@ -32,19 +32,30 @@ export default function Index() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<{ code: string } | null>(null);
   const [inputError, setInputError] = useState<{
+    id: string;
     name: string;
     subName: string;
-  }>({ name: "", subName: "" });
+  }>({ id: "", name: "", subName: "" });
   const [value, setValue] = useState<FBCoverInput>({
     template: "v2",
     id: "",
     name: "",
     subName: "",
     color: "",
+    phone: "",
+    email: "",
+    address: "",
   });
 
   const validateInputs = () => {
     let error = false;
+    if (!value.id && value.template === "v1") {
+      setInputError((prev) => ({
+        ...prev,
+        id: "Facebook Profile URL is required",
+      }));
+      error = true;
+    }
     if (!value.name) {
       setInputError((prev) => ({ ...prev, name: "First Name is required" }));
       error = true;
@@ -65,6 +76,19 @@ export default function Index() {
 
         switch (value.template) {
           case "v1":
+            const { data } = await axios.get(
+              "https://mrhairy-api.onrender.com/fb/uid?url=" + value.id
+            );
+
+            response = await deku.fbCover(
+              `/canvas/fbcover?&uid=${data.uid}&name=${value.name}&subname=${
+                value.subName
+              }&sdt=${value.phone || "N/A"}&address=${
+                value.address || "Philippines"
+              }&email=${value.email || "N/A"}&color=${
+                value.color.trim() || "cyan"
+              }`
+            );
             break;
 
           case "v2":
@@ -168,8 +192,10 @@ export default function Index() {
                 className="mt-1"
                 defaultValue="v2"
                 selectedValue={value.template}
-                onValueChange={(value) =>
-                  setValue((prev) => ({ ...prev, template: value }))
+                onValueChange={(val) =>
+                  value.template === "v1"
+                    ? setValue((prev) => ({ ...prev, id: "", template: val }))
+                    : setValue((prev) => ({ ...prev, template: val }))
                 }
               >
                 <SelectTrigger
@@ -195,11 +221,7 @@ export default function Index() {
                     <SelectDragIndicatorWrapper>
                       <SelectDragIndicator />
                     </SelectDragIndicatorWrapper>
-                    <SelectItem
-                      label="FB Cover v1 (unavailable)"
-                      isDisabled={true}
-                      value="v1"
-                    />
+                    <SelectItem label="FB Cover v1" value="v1" />
                     <SelectItem label="FB Cover v2" value="v2" />
                     <SelectItem label="FB Cover v3" value="v3" />
                   </SelectContent>
@@ -208,17 +230,31 @@ export default function Index() {
             </View>
 
             <View className="mt-2">
-              <Text className="font-nunito-semibold">Image Id:</Text>
+              <Text className="font-nunito-semibold">
+                {value.template === "v1"
+                  ? "Facebook Profile URL:"
+                  : "Image Id:"}
+              </Text>
               <Input className="mt-1">
                 <InputField
                   className="font-nunito-regular"
-                  placeholder="Enter a number from 0 - 845 (default: 5)"
-                  inputMode="numeric"
-                  onChangeText={(text) =>
-                    setValue((prev) => ({ ...prev, id: text }))
+                  placeholder={
+                    value.template === "v1"
+                      ? "https://www.facebook.com/username"
+                      : "Enter a number from 0 - 845 (default: 5)"
                   }
+                  inputMode={value.template === "v1" ? "text" : "numeric"}
+                  onChangeText={(text) => {
+                    setValue((prev) => ({ ...prev, id: text }));
+                    setInputError((prev) => ({ ...prev, id: "" }));
+                  }}
                 />
               </Input>
+              {inputError.id && (
+                <Text className="font-nunito-regular mt-0.5 text-red-600">
+                  {inputError.id}
+                </Text>
+              )}
             </View>
 
             <View className="mt-2">
@@ -259,12 +295,60 @@ export default function Index() {
               )}
             </View>
 
+            {value.template === "v1" && (
+              <View className="mt-2">
+                <Text className="font-nunito-semibold">Phone #:</Text>
+                <Input className="mt-1">
+                  <InputField
+                    className="font-nunito-regular"
+                    placeholder="Default: N/A"
+                    inputMode="numeric"
+                    onChangeText={(text) => {
+                      setValue((prev) => ({ ...prev, phone: text }));
+                    }}
+                  />
+                </Input>
+              </View>
+            )}
+
+            {value.template === "v1" && (
+              <View className="mt-2">
+                <Text className="font-nunito-semibold">Email:</Text>
+                <Input className="mt-1">
+                  <InputField
+                    className="font-nunito-regular"
+                    placeholder="Default: N/A"
+                    onChangeText={(text) => {
+                      setValue((prev) => ({ ...prev, email: text }));
+                    }}
+                  />
+                </Input>
+              </View>
+            )}
+
+            {value.template === "v1" && (
+              <View className="mt-2">
+                <Text className="font-nunito-semibold">Address:</Text>
+                <Input className="mt-1">
+                  <InputField
+                    className="font-nunito-regular"
+                    placeholder="Default: Philippines"
+                    onChangeText={(text) => {
+                      setValue((prev) => ({ ...prev, address: text }));
+                    }}
+                  />
+                </Input>
+              </View>
+            )}
+
             <View className="mt-2">
               <Text className="font-nunito-semibold">Color:</Text>
               <Input className="mt-1">
                 <InputField
                   className="font-nunito-regular outline-cyan-100"
-                  placeholder="Default: Blue"
+                  placeholder={
+                    value.template === "v1" ? "Cyan" : "Default: Blue"
+                  }
                   onChangeText={(text) =>
                     setValue((prev) => ({ ...prev, color: text }))
                   }
